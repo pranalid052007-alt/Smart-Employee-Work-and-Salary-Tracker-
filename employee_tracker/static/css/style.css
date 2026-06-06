@@ -1,0 +1,57 @@
+/*
+  Custom CSS for Smart Employee Tracker
+  - Styles the sidebar, content, and provides a clean color scheme
+  - Comments explain each section for students
+*/
+
+/* Body spacing */
+body {
+  padding-top: 56px; /* make room for navbar */
+  background-color: #f8f9fa;
+}
+
+/* Sidebar styles */
+#sidebar {
+  height: 100vh;
+  position: fixed;
+  top: 56px; /* below navbar */
+  left: 0;
+  padding-top: 1rem;
+  border-right: 1px solid #dee2e6;
+}
+
+.sidebar-nav a {
+  padding: 0.6rem 1rem;
+  display: block;
+  color: #333;
+}
+
+.sidebar-nav a:hover {
+  background-color: #e9ecef;
+}
+
+/* Sidebar uses sticky positioning so it stays visible without overlapping content.
+   Using sticky allows the sidebar to remain in normal document flow while
+   sticking to the top when scrolling. This avoids issues where fixed positioning
+   overlays the main content. */
+#sidebar {
+  width: 220px; /* fixed sidebar width for layout */
+  position: sticky; /* keep sidebar visible but in document flow */
+  top: 56px; /* below navbar */
+  height: calc(100vh - 56px);
+  overflow-y: auto; /* allow scrolling inside sidebar if long */
+}
+
+/* Main content stays in the grid flow; do not add manual left margin. */
+main {
+  margin-left: 0;
+  padding: 1rem;
+}
+
+/* Small screens: hide the sidebar and stack content for responsive layout */
+@media (max-width: 767.98px) {
+  #sidebar { display: none; }
+}
+
+/* Card display tweaks for presentation */
+.card { border-radius: 8px; }

@@ -1,0 +1,48 @@
+<!-- Admin dashboard template
+  - Displays summary cards for total counts
+-->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="pt-3 pb-2 mb-3 border-bottom">
+  <!-- App title shown on admin pages for clarity -->
+  <h1 class="h2">Smart Employee Work & Salary Tracker</h1>
+  <p class="text-muted">Admin Dashboard</p>
+</div>
+
+<div class="row">
+  <div class="col-md-3">
+    <div class="card mb-3">
+      <div class="card-body">
+        <h5 class="card-title">Total Employees</h5>
+        <p class="display-6">{{ total_employees }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card mb-3">
+      <div class="card-body">
+        <h5 class="card-title">Attendance Records</h5>
+        <p class="display-6">{{ total_attendance }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card mb-3">
+      <div class="card-body">
+        <h5 class="card-title">Work Logs</h5>
+        <p class="display-6">{{ total_worklogs }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card mb-3">
+      <div class="card-body">
+        <h5 class="card-title">Leave Requests</h5>
+        <p class="display-6">{{ total_leaves }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

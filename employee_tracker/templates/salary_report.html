@@ -1,0 +1,41 @@
+<!-- Salary report template for admins
+  - Lists computed salary for employees for current month
+  - Supports simple search via `q` query parameter
+-->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="pt-3 pb-2 mb-3 d-flex justify-content-between align-items-center border-bottom">
+  <h1 class="h2">Salary Report</h1>
+  <form method="GET" class="d-flex" action="{{ url_for('salary_report') }}">
+    <input class="form-control me-2" name="q" placeholder="Search by name or ID" value="{{ query }}">
+    <button class="btn btn-outline-primary">Search</button>
+  </form>
+</div>
+
+<div class="table-responsive">
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Employee</th>
+        <th>Attendance Days</th>
+        <th>Tasks Completed</th>
+        <th>Final Salary</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in report %}
+      <tr>
+        <td>{{ row.employee['name'] }} ({{ row.employee['employee_id'] }})</td>
+        <td>{{ row.attendance_days }}</td>
+        <td>{{ row.tasks_completed }}</td>
+        <td>{{ row.final_salary }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="4" class="text-center">No report data.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

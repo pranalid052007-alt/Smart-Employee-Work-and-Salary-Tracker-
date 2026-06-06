@@ -1,0 +1,65 @@
+<!-- Work log page template
+  - Form to submit a work log entry
+  - Shows previous work logs in a table
+-->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="pt-3 pb-2 mb-3 border-bottom">
+  <h1 class="h2">Work Log</h1>
+</div>
+
+<!-- Work log submission form -->
+<div class="card mb-3">
+  <div class="card-body">
+    <form method="POST">
+      <div class="row">
+        <div class="col-md-3 mb-3">
+          <label class="form-label">Date</label>
+          <input type="date" name="date" class="form-control">
+        </div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Task Description</label>
+          <input type="text" name="task_description" class="form-control" required>
+        </div>
+        <div class="col-md-1 mb-3">
+          <label class="form-label">Tasks</label>
+          <input type="number" name="tasks_completed" class="form-control" min="0" value="0">
+        </div>
+        <div class="col-md-2 mb-3">
+          <label class="form-label">Hours Worked</label>
+          <input type="number" name="hours_worked" class="form-control" step="0.1" min="0" value="0">
+        </div>
+      </div>
+      <button class="btn btn-primary">Submit Work Log</button>
+    </form>
+  </div>
+</div>
+
+<!-- Previous work logs -->
+<div class="table-responsive">
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Task</th>
+        <th>Tasks Completed</th>
+        <th>Hours</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for l in logs %}
+      <tr>
+        <td>{{ l['date'] }}</td>
+        <td>{{ l['task_description'] }}</td>
+        <td>{{ l['tasks_completed'] }}</td>
+        <td>{{ l['hours_worked'] }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="4" class="text-center">No work logs yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

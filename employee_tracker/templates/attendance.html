@@ -1,0 +1,44 @@
+<!-- Attendance page template
+  - Buttons for check-in and check-out
+  - Shows attendance history in a table
+-->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="pt-3 pb-2 mb-3 border-bottom">
+  <h1 class="h2">Attendance</h1>
+</div>
+
+<!-- Check-in / Check-out buttons form -->
+<form method="POST" class="mb-3">
+  <button name="action" value="check_in" class="btn btn-success">Check In</button>
+  <button name="action" value="check_out" class="btn btn-danger">Check Out</button>
+</form>
+
+<!-- Attendance history table -->
+<div class="table-responsive">
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Check In</th>
+        <th>Check Out</th>
+        <th>Total Hours</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in records %}
+      <tr>
+        <td>{{ r['date'] }}</td>
+        <td>{{ r['check_in'] or '-' }}</td>
+        <td>{{ r['check_out'] or '-' }}</td>
+        <td>{{ r['total_hours'] }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="4" class="text-center">No attendance records yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

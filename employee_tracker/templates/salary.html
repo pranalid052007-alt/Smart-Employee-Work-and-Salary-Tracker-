@@ -1,0 +1,25 @@
+<!-- Salary page template
+  - Shows breakdown of salary components and final salary
+  - Uses configured constants for attendance and performance bonuses
+-->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="pt-3 pb-2 mb-3 border-bottom">
+  <h1 class="h2">Salary</h1>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <h5 class="card-title">Salary Breakdown for {{ current_user.name }}</h5>
+    <p class="card-text">Base Salary: <strong>{{ base_salary }}</strong></p>
+    <p class="card-text">Attendance Days This Month: <strong>{{ attendance_days }}</strong></p>
+    <p class="card-text">Tasks Completed This Month: <strong>{{ tasks_completed }}</strong></p>
+    <p class="card-text">Attendance Bonus: <strong>{{ attendance_bonus }}</strong></p>
+    <p class="card-text">Performance Bonus: <strong>{{ performance_bonus }}</strong></p>
+    <hr>
+    <h4>Final Salary: <strong>{{ final_salary }}</strong></h4>
+  </div>
+</div>
+
+{% endblock %}

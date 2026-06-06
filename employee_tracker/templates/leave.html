@@ -1,0 +1,57 @@
+<!-- Leave request template
+  - Form to request leave
+  - Table showing user's leave requests and their statuses
+-->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="pt-3 pb-2 mb-3 border-bottom">
+  <h1 class="h2">Leave Requests</h1>
+</div>
+
+<!-- Leave form -->
+<div class="card mb-3">
+  <div class="card-body">
+    <form method="POST">
+      <div class="row">
+        <div class="col-md-3">
+          <label class="form-label">Leave Date</label>
+          <input type="date" name="leave_date" class="form-control" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Reason</label>
+          <input type="text" name="reason" class="form-control" required>
+        </div>
+        <div class="col-md-3 d-flex align-items-end">
+          <button class="btn btn-primary">Request Leave</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Leave requests table -->
+<div class="table-responsive">
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Leave Date</th>
+        <th>Reason</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in requests %}
+      <tr>
+        <td>{{ r['leave_date'] }}</td>
+        <td>{{ r['reason'] }}</td>
+        <td>{{ r['status'] }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="3" class="text-center">No leave requests yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

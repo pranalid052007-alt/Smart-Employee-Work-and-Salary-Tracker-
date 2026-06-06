@@ -1,0 +1,64 @@
+<!-- Employee dashboard template
+  - Shows cards for attendance, hours, tasks, performance, salary
+  - Uses Bootstrap cards for presentation
+-->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="pt-3 pb-2 mb-3 border-bottom">
+  <!-- App title shown on the main app pages for clarity -->
+  <h1 class="h2">Smart Employee Work & Salary Tracker</h1>
+  <p class="text-muted">Employee Dashboard — Welcome, {{ name }} &ndash; {{ department }}</p>
+</div>
+
+<!-- Summary cards -->
+<div class="row">
+  <div class="col-md-3">
+    <div class="card text-bg-light mb-3">
+      <div class="card-body">
+        <h5 class="card-title">Attendance Days</h5>
+        <p class="card-text display-6">{{ attendance_days }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-bg-light mb-3">
+      <div class="card-body">
+        <h5 class="card-title">Total Hours</h5>
+        <p class="card-text display-6">{{ total_hours }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-bg-light mb-3">
+      <div class="card-body">
+        <h5 class="card-title">Tasks Completed</h5>
+        <p class="card-text display-6">{{ tasks_completed }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-bg-light mb-3">
+      <div class="card-body">
+        <h5 class="card-title">Performance</h5>
+        <p class="card-text display-6">{{ performance }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Salary card -->
+<div class="row">
+  <div class="col-md-6">
+    <div class="card mb-3">
+      <div class="card-body">
+        <h5 class="card-title">Estimated Current Salary</h5>
+        <p class="card-text">Base Salary: <strong>{{ base_salary }}</strong></p>
+        <p class="card-text">Estimated Final: <strong>{{ estimated_salary }}</strong></p>
+        <a href="{{ url_for('salary') }}" class="btn btn-sm btn-primary">View Salary Details</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

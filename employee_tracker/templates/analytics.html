@@ -1,0 +1,69 @@
+<!-- Analytics template
+  - Renders Chart.js charts using datasets prepared in the analytics route
+  - Includes four charts: attendance, tasks, department counts, top performers
+-->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="pt-3 pb-2 mb-3 border-bottom">
+  <h1 class="h2">Analytics</h1>
+</div>
+
+<div class="row">
+  <div class="col-md-6 mb-4">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Attendance Overview (last 30)</h5>
+        <canvas id="attendanceChart"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6 mb-4">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Tasks Completed (last 30)</h5>
+        <canvas id="tasksChart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-6 mb-4">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Department-wise Count</h5>
+        <canvas id="deptChart"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6 mb-4">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Top Performers</h5>
+        <canvas id="topChart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Prepare data for JS from server-side variables -->
+<script>
+  // Attendance chart data
+  const attendanceLabels = {{ attendance_labels|tojson }};
+  const attendanceData = {{ attendance_data|tojson }};
+
+  // Tasks chart data
+  const tasksLabels = {{ tasks_labels|tojson }};
+  const tasksData = {{ tasks_data|tojson }};
+
+  // Department data
+  const deptLabels = {{ dept_labels|tojson }};
+  const deptData = {{ dept_data|tojson }};
+
+  // Top performers
+  const topLabels = {{ top_labels|tojson }};
+  const topData = {{ top_data|tojson }};
+</script>
+
+{% endblock %}
