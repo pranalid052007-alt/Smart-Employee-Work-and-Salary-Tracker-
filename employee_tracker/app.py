@@ -202,12 +202,14 @@ def init_db():
     # Seed sample admin and employee accounts if DB was newly created
     if first_time:
         # Sample admin: employee_id = ADMIN01, password = adminpass
-        admin_pw = generate_password_hash('adminpass')
+        # Use explicit pbkdf2:sha256 to avoid scrypt-related compatibility issues
+        admin_pw = generate_password_hash('adminpass', method='pbkdf2:sha256')
         c.execute('INSERT OR IGNORE INTO Employees (employee_id, name, email, password, department, role, base_salary) VALUES (?, ?, ?, ?, ?, ?, ?)',
                   ('ADMIN01', 'Alice Admin', 'alice.admin@example.com', admin_pw, 'Management', 'Admin', 0.0))
 
         # Sample employee: employee_id = EMP001, password = employeepass
-        emp_pw = generate_password_hash('employeepass')
+        # Use explicit pbkdf2:sha256 to avoid scrypt-related compatibility issues
+        emp_pw = generate_password_hash('employeepass', method='pbkdf2:sha256')
         c.execute('INSERT OR IGNORE INTO Employees (employee_id, name, email, password, department, role, base_salary) VALUES (?, ?, ?, ?, ?, ?, ?)',
                   ('EMP001', 'Bob Employee', 'bob.employee@example.com', emp_pw, 'Engineering', 'Employee', 2000.0))
 
