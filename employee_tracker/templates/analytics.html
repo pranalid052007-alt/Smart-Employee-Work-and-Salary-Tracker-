@@ -1,69 +1,134 @@
-<!-- Analytics template
-  - Renders Chart.js charts using datasets prepared in the analytics route
-  - Includes four charts: attendance, tasks, department counts, top performers
--->
+<!-- Line 1: file header comment: describes purpose of this template -->
+<!-- Analytics template -->
+<!-- Line 2: note describing that Chart.js charts are rendered using server data -->
+<!-- Renders Chart.js charts using datasets prepared in the analytics route -->
+<!-- Line 3: note listing the charts included in this template -->
+<!-- Includes four charts: attendance, tasks, department counts, top performers -->
+<!-- Line 4: end of header comment block -->
+<!-- -->
+<!-- Line 5: Jinja statement to extend the base layout `base.html` -->
 {% extends 'base.html' %}
+<!-- Line 6: blank line for readability (no functional effect) -->
 
+<!-- Line 7: start of the `content` block which fills base layout's placeholder -->
 {% block content %}
+<!-- Line 8: top section wrapper with padding and a bottom border -->
 <div class="pt-3 pb-2 mb-3 border-bottom">
+<!-- Line 9: page title shown as H1-sized heading -->
   <h1 class="h2">Analytics</h1>
+<!-- Line 10: close the top section wrapper -->
 </div>
+<!-- Line 11: blank line separating sections -->
 
+<!-- Line 12: container row for two charts (attendance and tasks) -->
 <div class="row">
+<!-- Line 13: first column (half width on md and up) with bottom margin -->
   <div class="col-md-6 mb-4">
+<!-- Line 14: card component wrapper for styling -->
     <div class="card">
+<!-- Line 15: card body container -->
       <div class="card-body">
+<!-- Line 16: small card title for the attendance chart -->
         <h5 class="card-title">Attendance Overview (last 30)</h5>
+<!-- Line 17: canvas element where Chart.js will render the attendance chart -->
         <canvas id="attendanceChart"></canvas>
+<!-- Line 18: close card body -->
       </div>
+<!-- Line 19: close card -->
     </div>
+<!-- Line 20: close first column -->
   </div>
+<!-- Line 21: second column for tasks chart (same layout as first) -->
   <div class="col-md-6 mb-4">
+<!-- Line 22: card wrapper for tasks chart -->
     <div class="card">
+<!-- Line 23: card body for tasks chart -->
       <div class="card-body">
+<!-- Line 24: title for tasks chart -->
         <h5 class="card-title">Tasks Completed (last 30)</h5>
+<!-- Line 25: canvas element for tasks chart rendering -->
         <canvas id="tasksChart"></canvas>
+<!-- Line 26: close card body -->
       </div>
+<!-- Line 27: close card -->
     </div>
+<!-- Line 28: close second column -->
   </div>
+<!-- Line 29: close the top row container -->
 </div>
+<!-- Line 30: blank line before next row -->
 
+<!-- Line 31: second row containing department and top performer charts -->
 <div class="row">
+<!-- Line 32: first column in this row for department counts -->
   <div class="col-md-6 mb-4">
+<!-- Line 33: card wrapper for department chart -->
     <div class="card">
+<!-- Line 34: card body container -->
       <div class="card-body">
+<!-- Line 35: title for department-wise count chart -->
         <h5 class="card-title">Department-wise Count</h5>
+<!-- Line 36: canvas element for department chart -->
         <canvas id="deptChart"></canvas>
+<!-- Line 37: close card body -->
       </div>
+<!-- Line 38: close card -->
     </div>
+<!-- Line 39: close first column of second row -->
   </div>
+<!-- Line 40: second column for top performers chart -->
   <div class="col-md-6 mb-4">
+<!-- Line 41: card wrapper for top performers -->
     <div class="card">
+<!-- Line 42: card body -->
       <div class="card-body">
+<!-- Line 43: title for top performers chart -->
         <h5 class="card-title">Top Performers</h5>
+<!-- Line 44: canvas element for top performers chart -->
         <canvas id="topChart"></canvas>
+<!-- Line 45: close card body -->
       </div>
+<!-- Line 46: close card -->
     </div>
+<!-- Line 47: close second column -->
   </div>
+<!-- Line 48: close second row container -->
 </div>
+<!-- Line 49: blank line before script block -->
 
+<!-- Line 50: comment indicating preparation of JS data from server-side variables -->
 <!-- Prepare data for JS from server-side variables -->
+<!-- Line 51: start inline script to assign template variables into JS constants -->
 <script>
+<!-- Line 52: comment indicating attendance chart data lines -->
   // Attendance chart data
+<!-- Line 53: assign attendance labels from Jinja variable, serialized to JSON -->
   const attendanceLabels = {{ attendance_labels|tojson }};
+<!-- Line 54: assign attendance numeric data from Jinja variable -->
   const attendanceData = {{ attendance_data|tojson }};
 
+<!-- Line 55: comment indicating tasks chart data section -->
   // Tasks chart data
+<!-- Line 56: assign tasks labels from server-side variable -->
   const tasksLabels = {{ tasks_labels|tojson }};
+<!-- Line 57: assign tasks numeric data -->
   const tasksData = {{ tasks_data|tojson }};
 
+<!-- Line 58: comment indicating department chart data -->
   // Department data
+<!-- Line 59: assign department labels -->
   const deptLabels = {{ dept_labels|tojson }};
+<!-- Line 60: assign department counts -->
   const deptData = {{ dept_data|tojson }};
 
+<!-- Line 61: comment indicating top performers data -->
   // Top performers
+<!-- Line 62: assign top performer labels -->
   const topLabels = {{ top_labels|tojson }};
+<!-- Line 63: assign top performer numeric data -->
   const topData = {{ top_data|tojson }};
+<!-- Line 64: end of script block -->
 </script>
 
+<!-- Line 65: end of Jinja `content` block to return control to base template -->
 {% endblock %}

@@ -1,4 +1,4 @@
-"""
+"""  # file header docstring: describes app purpose
 Smart Employee Work & Salary Tracker
 Main Flask application file.
 
@@ -9,30 +9,39 @@ leave requests, salary calculation, and admin functions.
 Every function and route is commented for educational clarity.
 """
 
+# Import Flask and helpers used for rendering and request handling
 from flask import Flask, render_template, request, redirect, url_for, flash, g
+# Import Flask-Login classes and helpers for authentication
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+# Import password hashing utilities
 from werkzeug.security import generate_password_hash, check_password_hash
+# Import SQLite and OS modules for DB and filesystem operations
 import sqlite3
 import os
+# Import datetime helpers
 from datetime import datetime, date
 
 # --------------------
 # Configuration
 # --------------------
+# BASE_DIR: absolute path of this file's directory
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+# DB_PATH: path to the SQLite database file under `database` folder
 DB_PATH = os.path.join(BASE_DIR, 'database', 'employee.db')
 
+# Create Flask app instance
 app = Flask(__name__)
-# Secret key for session management and flash messages. In production, use a secure value.
+# Set a development secret key for session/signing (replace in production)
 app.config['SECRET_KEY'] = 'dev-secret-key-for-demo'
 
-# Initialize Flask-Login
+# Initialize Flask-Login manager
 login_manager = LoginManager()
+# Set the login view name for redirecting unauthenticated users
 login_manager.login_view = 'login'
+# Attach login manager to app
 login_manager.init_app(app)
 
-# Attendance and performance bonus configuration constants
-# These are configurable constants used in salary calculation.
+# Constants used for computing bonuses in salary calculations
 ATTENDANCE_BONUS = 50   # Amount per attendance day
 PERFORMANCE_BONUS = 10  # Amount per task completed
 
@@ -45,16 +54,19 @@ def get_db():
     Returns a connection to the SQLite database. If the connection already
     exists on `g`, reuse it.
     """
+    # Try to reuse a DB connection stored on Flask's `g`
     db = getattr(g, '_database', None)
     if db is None:
         # Connect to SQLite database; create file if it doesn't exist
         db = g._database = sqlite3.connect(DB_PATH)
+        # Return rows as sqlite3.Row for dict-like access
         db.row_factory = sqlite3.Row
     return db
 
 @app.teardown_appcontext
 def close_connection(exception):
     """Close DB connection after request finishes."""
+    # Close DB connection if it was opened for this request
     db = getattr(g, '_database', None)
     if db is not None:
         db.close()
@@ -65,9 +77,11 @@ def query_db(query, args=(), one=False):
     `query` is SQL, `args` is tuple of parameters. If `one` is True,
     return a single row or None.
     """
+    # Execute query and fetch all results
     cur = get_db().execute(query, args)
     rv = cur.fetchall()
     cur.close()
+    # Return single row if requested, otherwise list of rows
     return (rv[0] if rv else None) if one else rv
 
 def execute_db(query, args=()):
@@ -88,10 +102,15 @@ class User(UserMixin):
     `Employees` table in the SQLite database.
     """
     def __init__(self, id_, employee_id, name, email, role):
+        # Internal DB id
         self.id = id_
+        # Employee identifier used for login
         self.employee_id = employee_id
+        # Human-readable name
         self.name = name
+        # Contact email
         self.email = email
+        # Role string (e.g., 'Admin' or 'Employee')
         self.role = role
 
     @staticmethod
@@ -102,6 +121,7 @@ class User(UserMixin):
         """
         row = query_db('SELECT * FROM Employees WHERE employee_id = ?', (emp_id,), one=True)
         if row:
+            # Construct and return User wrapper from DB row
             return User(row['id'], row['employee_id'], row['name'], row['email'], row['role'])
         return None
 
@@ -228,15 +248,20 @@ def calculate_total_hours(check_in_str, check_out_str):
 
     Returns total hours as float.
     """
+    # Return 0 if either timestamp is missing
     if not check_in_str or not check_out_str:
         return 0.0
+    # Expected timestamp format
     fmt = '%Y-%m-%d %H:%M:%S'
     try:
+        # Parse timestamps to datetime objects
         dt_in = datetime.strptime(check_in_str, fmt)
         dt_out = datetime.strptime(check_out_str, fmt)
+        # Compute difference and convert to hours rounded to 2 decimals
         diff = dt_out - dt_in
         return round(diff.total_seconds() / 3600.0, 2)
     except Exception:
+        # On parse error, return 0.0
         return 0.0
 
 def compute_performance_rating(total_tasks):
@@ -268,6 +293,7 @@ def login():
     Accepts Employee ID and Password via POST. On successful authentication,
     logs in user using Flask-Login and redirects based on role.
     """
+    # Handle POST form submission for login
     if request.method == 'POST':
         employee_id = request.form.get('employee_id')
         password = request.form.get('password')
@@ -297,6 +323,7 @@ def login():
 @login_required
 def logout():
     """Logout route. Logs out the current user and redirects to login."""
+    # Logout current user via Flask-Login
     logout_user()
     flash('You have been logged out.', 'info')
     return redirect(url_for('login'))
@@ -313,6 +340,7 @@ def dashboard():
     attendance days, total hours, tasks completed, performance rating, and
     estimated current salary.
     """
+    # Current employee identifier from logged-in user
     emp_id = current_user.employee_id
 
     # Total attendance days for employee (count distinct dates)
@@ -356,6 +384,7 @@ def attendance():
     Allows employees to check in and check out. Stores timestamps and computes
     total hours for the day. Displays attendance history.
     """
+    # Current employee id and timestamps
     emp_id = current_user.employee_id
     now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     today = date.today().isoformat()
@@ -403,20 +432,23 @@ def worklog():
     Allows employees to submit daily work logs (task description, tasks completed,
     and hours worked) and view previous logs.
     """
+    # Current employee identifier
     emp_id = current_user.employee_id
+    # Handle form submission for new work log
     if request.method == 'POST':
-        # Gather form data and insert into WorkLogs
+        # Gather form data and provide sensible defaults
         entry_date = request.form.get('date') or date.today().isoformat()
         task_description = request.form.get('task_description')
         tasks_completed = int(request.form.get('tasks_completed') or 0)
         hours_worked = float(request.form.get('hours_worked') or 0.0)
 
+        # Insert work log row
         execute_db('INSERT INTO WorkLogs (employee_id, date, task_description, tasks_completed, hours_worked) VALUES (?, ?, ?, ?, ?)',
                    (emp_id, entry_date, task_description, tasks_completed, hours_worked))
         flash('Work log submitted.', 'success')
         return redirect(url_for('worklog'))
 
-    # GET: show last 30 work logs
+    # GET: query and render last 30 work logs for this employee
     logs = query_db('SELECT * FROM WorkLogs WHERE employee_id = ? ORDER BY date DESC LIMIT 30', (emp_id,))
     return render_template('worklog.html', logs=logs)
 
@@ -429,18 +461,20 @@ def salary():
     Uses the following formula:
       Final Salary = Base Salary + (Attendance Days × Attendance Bonus) + (Tasks Completed × Performance Bonus)
     """
+    # Current employee identifier
     emp_id = current_user.employee_id
-    # Fetch base salary
+    # Fetch base salary from Employees table
     emp_row = query_db('SELECT base_salary FROM Employees WHERE employee_id = ?', (emp_id,), one=True)
     base_salary = emp_row['base_salary'] if emp_row else 0.0
 
-    # Calculate attendance days and tasks completed this month
+    # Calculate attendance days and tasks completed for current month
     month_prefix = date.today().strftime('%Y-%m')
     rows = query_db('SELECT COUNT(DISTINCT date) AS days FROM Attendance WHERE employee_id = ? AND date LIKE ?', (emp_id, month_prefix + '%'), one=True)
     attendance_days = rows['days'] if rows else 0
     rows = query_db('SELECT SUM(tasks_completed) AS tasks FROM WorkLogs WHERE employee_id = ? AND date LIKE ?', (emp_id, month_prefix + '%'), one=True)
     tasks_completed = rows['tasks'] if rows and rows['tasks'] else 0
 
+    # Compute components and final salary
     attendance_bonus = attendance_days * ATTENDANCE_BONUS
     performance_bonus = tasks_completed * PERFORMANCE_BONUS
     final_salary = base_salary + attendance_bonus + performance_bonus
@@ -457,7 +491,9 @@ def leave():
     Employees can request leave; requests are stored with status 'Pending'.
     Admin actions are on a separate admin route to approve/reject.
     """
+    # Current employee identifier
     emp_id = current_user.employee_id
+    # Handle leave request submission
     if request.method == 'POST':
         leave_date = request.form.get('leave_date')
         reason = request.form.get('reason')
@@ -482,6 +518,7 @@ def admin_required(func):
     from functools import wraps
     @wraps(func)
     def wrapper(*args, **kwargs):
+        # If not authenticated or not an admin, redirect to login with message
         if not current_user.is_authenticated or current_user.role != 'Admin':
             flash('Admin access required.', 'danger')
             return redirect(url_for('login'))
@@ -497,18 +534,19 @@ def admin_dashboard():
     Displays summary counts of employees, attendance records, work logs, and leave requests.
     """
     # Total employees
+    # Count total employees
     rows = query_db('SELECT COUNT(*) AS cnt FROM Employees', (), one=True)
     total_employees = rows['cnt'] if rows else 0
 
-    # Total attendance records
+    # Count total attendance records
     rows = query_db('SELECT COUNT(*) AS cnt FROM Attendance', (), one=True)
     total_attendance = rows['cnt'] if rows else 0
 
-    # Total work logs
+    # Count total work logs
     rows = query_db('SELECT COUNT(*) AS cnt FROM WorkLogs', (), one=True)
     total_worklogs = rows['cnt'] if rows else 0
 
-    # Total leave requests
+    # Count total leave requests
     rows = query_db('SELECT COUNT(*) AS cnt FROM LeaveRequests', (), one=True)
     total_leaves = rows['cnt'] if rows else 0
 
@@ -524,6 +562,7 @@ def employee_management():
 
     Shows a table of employees and provides links for add/edit/delete via forms.
     """
+    # Fetch all employees ordered by newest first
     employees = query_db('SELECT * FROM Employees ORDER BY id DESC')
     return render_template('employee_management.html', employees=employees)
 
@@ -536,6 +575,7 @@ def add_employee():
     Creates a new Employees row with hashed password.
     """
     if request.method == 'POST':
+        # Gather form fields for new employee
         employee_id = request.form.get('employee_id')
         name = request.form.get('name')
         email = request.form.get('email')
@@ -544,6 +584,7 @@ def add_employee():
         role = request.form.get('role')
         base_salary = float(request.form.get('base_salary') or 0.0)
 
+        # Hash password using default method
         hashed = generate_password_hash(password)
         try:
             execute_db('INSERT INTO Employees (employee_id, name, email, password, department, role, base_salary) VALUES (?, ?, ?, ?, ?, ?, ?)',
@@ -560,12 +601,14 @@ def add_employee():
 @admin_required
 def edit_employee(id):
     """Admin route to edit an existing employee by internal id."""
+    # Load employee row by id
     row = query_db('SELECT * FROM Employees WHERE id = ?', (id,), one=True)
     if not row:
         flash('Employee not found.', 'danger')
         return redirect(url_for('employee_management'))
 
     if request.method == 'POST':
+        # Gather updated fields and apply update
         name = request.form.get('name')
         email = request.form.get('email')
         department = request.form.get('department')
@@ -583,6 +626,7 @@ def edit_employee(id):
 @admin_required
 def delete_employee(id):
     """Admin route to delete an employee by id."""
+    # Delete employee row by id
     execute_db('DELETE FROM Employees WHERE id = ?', (id,))
     flash('Employee deleted.', 'info')
     return redirect(url_for('employee_management'))
@@ -592,6 +636,7 @@ def delete_employee(id):
 @admin_required
 def admin_leaves():
     """Admin view for leave requests where admin can approve or reject."""
+    # Fetch all leave requests for admin review
     requests_ = query_db('SELECT * FROM LeaveRequests ORDER BY id DESC')
     return render_template('admin_leaves.html', requests=requests_)
 
@@ -600,6 +645,7 @@ def admin_leaves():
 @admin_required
 def leave_action(id):
     """Admin action route to approve or reject a leave request."""
+    # Action for approving or rejecting leave requests
     action = request.form.get('action')
     if action == 'approve':
         execute_db('UPDATE LeaveRequests SET status = ? WHERE id = ?', ('Approved', id))
@@ -618,10 +664,11 @@ def salary_report():
     Aggregates attendance, work logs, and computes salary for each employee for
     the current month. Provides simple search via query param `q`.
     """
+    # Read optional search query
     q = request.args.get('q', '')
     month_prefix = date.today().strftime('%Y-%m')
 
-    # Base query to fetch employees
+    # Base query to fetch employees (optionally filtered by query)
     if q:
         employees = query_db('SELECT * FROM Employees WHERE name LIKE ? OR employee_id LIKE ? ORDER BY id DESC', ('%'+q+'%', '%'+q+'%'))
     else:
@@ -650,6 +697,7 @@ def analytics():
     Prepares datasets for Chart.js charts: attendance overview, tasks completed,
     department-wise counts, and top performers.
     """
+    # Attendance overview: count attendance per day (last 30 days)
     # Attendance overview: count attendance per day (last 30 days)
     rows = query_db('SELECT date, COUNT(*) AS cnt FROM Attendance GROUP BY date ORDER BY date DESC LIMIT 30')
     attendance_labels = [r['date'] for r in rows][::-1]
